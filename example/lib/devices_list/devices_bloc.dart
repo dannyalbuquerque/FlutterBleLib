@@ -108,16 +108,22 @@ class DevicesBloc {
   void _startScan() {
     Fimber.d("Ble client created");
     _scanSubscription =
-        _bleManager.startPeripheralScan().listen((ScanResult scanResult) {
+        _bleManager.startPeripheralScan(uuids: ["0000180d-0000-1000-8000-00805f9b34fb"]).listen((ScanResult scanResult) {
       var bleDevice = BleDevice(scanResult);
       if (scanResult.advertisementData.localName != null &&
           !bleDevices.contains(bleDevice)) {
         Fimber.d(
             'found new device ${scanResult.advertisementData.localName} ${scanResult.peripheral.identifier}');
+        print(bleDevice.peripheral.toString());
         bleDevices.add(bleDevice);
         _visibleDevicesController.add(bleDevices.sublist(0));
       }
     });
+
+    _bleManager.connectedPeripherals(["0000180d-0000-1000-8000-00805f9b34fb"]).then((devices)  {
+      print(devices);
+    });
+    
   }
 
   Future<void> refresh() async {
